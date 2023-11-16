@@ -14,7 +14,7 @@ export default function KalisLayout({
       <nav>
         <ul>
           {
-            posts.map((post, index) => (<Link key={index} href={`/hr/${post.slug}`}>
+            posts.map((post, index) => (<Link key={index} href={`/kalis/${post.slug}`}>
               <li>{post.title} - {post.date}</li>
             </Link>))
           }
