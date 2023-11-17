@@ -1,13 +1,15 @@
 import React from 'react';
 import { getAllPosts } from '@/app/lib/api';
 import Link from 'next/link';
+import { HR_SEGMENT, MENU_DATA_LIST } from '@/app/constants/constants';
+import { PostType } from '@/app/interfaces/posts';
 
-export default function HrLayout({
-                                   children,
-                                 }: {
+export default async function HrLayout({
+                                         children,
+                                       }: {
   children: React.ReactNode
 }) {
-  const posts = getAllPosts('hr', ['slug', 'title', 'date']);
+  const posts: PostType[] = await getAllPosts(HR_SEGMENT, [...MENU_DATA_LIST]);
   return (
     <section>
       {/*__post/hr*/}
