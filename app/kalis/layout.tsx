@@ -1,4 +1,5 @@
 import React from 'react';
+import Navigation from '@/app/kalis/(components)/navigation';
 
 export default function KalisLayout({
                                       children,
@@ -7,6 +8,7 @@ export default function KalisLayout({
 }) {
   return (
     <section>
+      <Navigation />
       {children}
     </section>
   );
