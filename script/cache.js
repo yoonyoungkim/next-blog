@@ -46,7 +46,7 @@ function postData(segment) {
 
     return result;
   });
-  return `const posts = ${JSON.stringify(posts)}; export default posts;`;
+  return `export const posts = ${JSON.stringify(posts)};`;
 }
 
 try {
