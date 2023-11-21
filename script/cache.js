@@ -2,9 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
 
+const ROOT_FOLDER = '__posts';
+const ALL_METADATA_LIST = [
+  'title',
+  'author',
+  'date',
+  'test',
+];
+const SLUG = 'slug';
+const CONTENT = 'content';
+
 function getAllDirectories() {
   return new Promise((resolve, reject) => {
-    const postsDirectory = path.join(process.cwd(), '__posts');
+    const postsDirectory = path.join(process.cwd(), ROOT_FOLDER);
     fs.readdir(postsDirectory, (error, fileList) => {
       if (error) {
         reject(error);
@@ -15,16 +25,7 @@ function getAllDirectories() {
 }
 
 function postData(segment) {
-  const ALL_METADATA_LIST = [
-    'title',
-    'author',
-    'date',
-    'test',
-  ];
-  const SLUG = 'slug';
-  const CONTENT = 'content';
-
-  const postsPath = `__posts/${segment}`;
+  const postsPath = `${ROOT_FOLDER}/${segment}`;
   const postsDirectory = path.join(process.cwd(), postsPath);
   const fileNames = fs.readdirSync(postsDirectory);
   const posts = fileNames.map(fileName => {

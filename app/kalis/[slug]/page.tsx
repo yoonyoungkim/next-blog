@@ -11,9 +11,12 @@ export default async function Page({ params }: {
     ...PAGE_DATA_LIST,
   ]);
   const content = await markdownToHtml(post.content || '');
-  return <>
-    <div>---------</div>
-    <div>{post.title}</div>
-    <div dangerouslySetInnerHTML={{ __html: content }} />
-  </>;
+
+  return (
+    <div style={{ display: 'flex-columns' }}>
+      <div>Title: {post.title}</div>
+      <div>Author: {post.author}</div>
+      <div dangerouslySetInnerHTML={{ __html: content }} />
+    </div>
+  );
 }

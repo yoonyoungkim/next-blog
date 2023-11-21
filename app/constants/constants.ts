@@ -5,7 +5,7 @@ export const MENU_DATA_LIST: string[] = [
 
 export const PAGE_DATA_LIST: string[] = [
   'title',
-  'date',
+  'author',
   'content',
 ];
 
