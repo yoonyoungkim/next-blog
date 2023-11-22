@@ -2,6 +2,10 @@ import { getPostBySlug } from '@/app/lib/api';
 import markdownToHtml from '@/app/lib/markdownToHtml';
 import { KALIS_SEGMENT, PAGE_DATA_LIST } from '@/app/constants/constants';
 
+export function generateStaticParams() {
+  return [{ slug: 'example1' }];
+}
+
 export default async function Page({ params }: {
   params: {
     slug: string,

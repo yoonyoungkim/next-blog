@@ -1,5 +1,5 @@
 import React from 'react';
-import Navigation from '@/app/hr/(components)/navigation';
+import Navigation from '@/app/components/navigation';
 
 export default async function HrLayout({
                                          children,
@@ -9,7 +9,7 @@ export default async function HrLayout({
   return (
     <section style={{ display: 'flex' }}>
       <nav>
-        <Navigation />
+        <Navigation segment={'hr'} />
       </nav>
       {children}
     </section>

@@ -8,6 +8,10 @@ type Items = {
   [key: string]: string;
 }
 
+export async function getCachedPostsBySegment(segment: string) {
+  return await require((`../../cache/${segment}.js`)).posts;
+}
+
 export function getPostFileTitleListBySegment(segment: string = '') {
   return fs.readdirSync(`${postsDirectory}/${segment}`);
 }
@@ -35,20 +39,4 @@ export function getPostBySlug(segment: string = '', postFileTitle: string, field
   });
 
   return items; // { slug, content, metadata1, metadata2, ... }
-}
-
-const getCachedPostsBySegment = async (segment: string) => {
-  return await require((`../../cache/${segment}.js`)).posts;
-};
-
-export async function getAllPosts(segment: string, fields: string[] = []) {
-  const cachedPostFileTitleList = (await getCachedPostsBySegment(segment));
-  const postFileTitleList = getPostFileTitleListBySegment(segment)
-    .map((postFileTitle) => getPostBySlug(segment, postFileTitle, fields));
-
-  const posts = process.env.NODE_ENV === 'production' ?
-    cachedPostFileTitleList : postFileTitleList;
-
-  return posts
-    .sort((post1: Items, post2: Items) => (post1.date > post2.date) ? -1 : 1);
 }

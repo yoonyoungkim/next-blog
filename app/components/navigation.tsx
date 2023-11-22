@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { PostType } from '@/app/interfaces/posts';
 import MenuClose from '@/app/public/icon__menu-close-white.svg';
@@ -8,24 +8,24 @@ import MenuOpen from '@/app/public/icon__menu-open-white.svg';
 import Image from 'next/image';
 
 
-const Navigation = () => {
+const Navigation = ({ segment }: { segment: string }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(true);
   const [posts, setPosts] = useState<PostType[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
+  const filteredPosts = useMemo(() => posts
+    .filter(({ title }) => !title ? true : title.includes(searchKeyword)), [posts, searchKeyword]);
+
   useEffect(() => {
     (async () => {
-      const response = await fetch('/api/posts?segment=kalis&fields=title&fields=date');
+      const response = await fetch(`/api/${segment}/posts`);
       const posts = await response.json();
       setPosts(posts);
     })();
-  }, []);
+  }, [segment]);
 
   const handleChange = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(event.target.value);
-    const response = await fetch(`/api/posts/search?segment=kalis&fields=title&fields=date&searchKeyword=${event.target.value}`);
-    const posts = await response.json();
-    setPosts(posts);
   }, []);
 
   const handleClick = useCallback(() => {
@@ -44,8 +44,8 @@ const Navigation = () => {
         </div>
         <ul>
           {
-            posts.map((post, index) => (
-              <Link key={index} href={`/kalis/${post.slug}`}>
+            filteredPosts.map((post, index) => (
+              <Link key={index} href={`/${segment}/${post.slug}`}>
                 <li style={{ color: '#ffffff' }}>{post.title} - {post.date}</li>
               </Link>
             ))
