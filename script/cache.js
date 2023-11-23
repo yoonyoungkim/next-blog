@@ -48,9 +48,9 @@ function getLeafFiles(segment) {
   return result;
 }
 
-function postData(segment) {
+function getPostData(segment) {
   const leafFiles = getLeafFiles(segment);
-  const posts = leafFiles.map(fullPath => {
+  return leafFiles.map(fullPath => {
     const slug = fullPath.replace(`${process.cwd()}/${ROOT_FOLDER}/${segment}/`, '').replace(/\.md$/, '');
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const matterResult = matter(fileContents);
@@ -66,7 +66,11 @@ function postData(segment) {
     });
 
     return result;
-  })
+  });
+}
+
+function getExportPost(segment) {
+  const posts = getPostData(segment);
   return `export const posts = ${JSON.stringify(posts)};`;
 }
 
@@ -79,7 +83,7 @@ try {
 getAllDirectories()
   .then((directories) => {
     directories.forEach((directory) => {
-      fs.writeFile(`cache/${directory}.js`, postData(directory), function(error) {
+      fs.writeFile(`cache/${directory}.js`, getExportPost(directory), function(error) {
         if (error) return console.log(error);
         console.log(`${directory}/'s Posts cached.`);
       });

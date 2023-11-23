@@ -8,14 +8,6 @@ type Items = {
   [key: string]: string;
 }
 
-export async function getCachedPostsBySegment(segment: string) {
-  return await require((`../../cache/${segment}.js`)).posts;
-}
-
-export function getPostFileTitleListBySegment(segment: string = '') {
-  return fs.readdirSync(`${postsDirectory}/${segment}`);
-}
-
 export function getPostBySlug(segment: string = '', postFileTitle: string, fields: string[] = []) {
   const slug = postFileTitle.replace(/\.md$/, '');
   const fullPath = join(`${postsDirectory}/${segment}`, `${slug}.md`);
