@@ -1,4 +1,4 @@
-import { PostType } from '@/app/interfaces/posts';
+import { PostType } from '@/app/interfaces/post';
 
 
 type Items = {

@@ -2,24 +2,49 @@
 
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { PostType } from '@/app/interfaces/posts';
+import { PostType } from '@/app/interfaces/post';
 import MenuClose from '@/app/public/icon__menu-close-white.svg';
 import MenuOpen from '@/app/public/icon__menu-open-white.svg';
 import Image from 'next/image';
+import { TreePostType } from '@/app/interfaces/treePost';
+import Tree from '@/app/components/tree';
+
+const arrayToTree: any = (arr: TreePostType[], parentId = '') =>
+  arr.filter(item => item.parentId === parentId)
+    .map(child => ({ ...child, children: arrayToTree(arr, child.id) }));
+
+interface PostTypeWithIsOpen extends PostType {
+  isOpen: boolean;
+}
 
 
 const Navigation = ({ segment }: { segment: string }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(true);
-  const [posts, setPosts] = useState<PostType[]>([]);
+  const [posts, setPosts] = useState<PostTypeWithIsOpen[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
+  const hasSearchKeyword = useMemo(() => searchKeyword?.length > 0, [searchKeyword?.length]);
   const filteredPosts = useMemo(() => posts
     .filter(({ title }) => !title ? true : title.includes(searchKeyword)), [posts, searchKeyword]);
+  const treePosts = useMemo(() => {
+    const postsWithId = posts.map(post => {
+      const slugArray = post.slug.split('/').filter(slug => slug !== 'index');
+      return {
+        id: slugArray.join('_'),
+        parentId: slugArray.slice(0, slugArray.length - 1).join('_'),
+        slug: `${segment}/${post.slug}`,
+        title: post.title,
+        isOpen: post.isOpen,
+      };
+    });
+    return arrayToTree(postsWithId);
+  }, [posts]);
 
   useEffect(() => {
     (async () => {
       const response = await fetch(`/api/${segment}/posts`);
-      const posts = await response.json();
+      const posts = (await response.json())
+        .map((post: PostTypeWithIsOpen) => ({ ...post, isOpen: true }));
       setPosts(posts);
     })();
   }, [segment]);
@@ -31,6 +56,18 @@ const Navigation = ({ segment }: { segment: string }) => {
   const handleClick = useCallback(() => {
     setIsOpenMenu(!isOpenMenu);
   }, [isOpenMenu]);
+
+  const handleClickTreeItem = useCallback((slug: string) => {
+    setPosts(posts.map((post: PostTypeWithIsOpen) => {
+      if (slug === `${segment}/${post.slug}`) {
+        return {
+          ...post,
+          isOpen: !post.isOpen,
+        };
+      }
+      return post;
+    }));
+  }, [posts]);
 
   return (
     <div
@@ -44,11 +81,11 @@ const Navigation = ({ segment }: { segment: string }) => {
         </div>
         <ul>
           {
-            filteredPosts.map((post, index) => (
+            hasSearchKeyword ? (filteredPosts.map((post, index) => (
               <Link key={index} href={`/${segment}/${post.slug}`}>
                 <li style={{ color: '#ffffff' }}>{post.title}</li>
               </Link>
-            ))
+            ))) : <Tree tree={treePosts} handleClickTreeItem={handleClickTreeItem} />
           }
         </ul>
       </div>) : (<div style={{ padding: '20px 10px' }}>
