@@ -5,9 +5,8 @@ const matter = require('gray-matter');
 const ROOT_FOLDER = '__posts';
 const ALL_METADATA_LIST = [
   'title',
-  'author',
-  'date',
-  'test',
+  'depth',
+  'seq',
 ];
 const SLUG = 'slug';
 const CONTENT = 'content';
@@ -24,13 +23,35 @@ function getAllDirectories() {
   });
 }
 
-function postData(segment) {
+function recursive(destinationPath, result) {
+  try {
+    fs.readdirSync(destinationPath, { withFileTypes: true })
+      .forEach((file) => {
+        const path = `${destinationPath}/${file.name}`;
+        if (file.isDirectory()) {
+          recursive(path, result);
+        } else {
+          result.push(path);
+        }
+      });
+  } catch (error) {
+    return console.error('Read Error', error);
+  }
+}
+
+function getLeafFiles(segment) {
   const postsPath = `${ROOT_FOLDER}/${segment}`;
   const postsDirectory = path.join(process.cwd(), postsPath);
-  const fileNames = fs.readdirSync(postsDirectory);
-  const posts = fileNames.map(fileName => {
-    const slug = fileName.replace(/\.md$/, '');
-    const fullPath = path.join(postsDirectory, fileName);
+
+  let result = [];
+  recursive(postsDirectory, result);
+  return result;
+}
+
+function postData(segment) {
+  const leafFiles = getLeafFiles(segment);
+  const posts = leafFiles.map(fullPath => {
+    const slug = fullPath.replace(`${process.cwd()}/${ROOT_FOLDER}/${segment}/`, '').replace(/\.md$/, '');
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const matterResult = matter(fileContents);
 
@@ -45,7 +66,7 @@ function postData(segment) {
     });
 
     return result;
-  });
+  })
   return `export const posts = ${JSON.stringify(posts)};`;
 }
 

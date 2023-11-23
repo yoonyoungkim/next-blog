@@ -1,9 +1,7 @@
-import { Author } from '@/app/interfaces/author';
-
 export type PostType = {
   title: string;
-  date: string;
-  author: Author;
+  depth: number;
+  seq: number;
   content: string;
   slug: string;
 }

@@ -1,7 +1,8 @@
 ---
-title: 마크다운 테스트 - kalis
+title: depth 1 / seq 1
 author: 바보
-date: '2022-10-19'
+depth: 1
+seq: 1
 ---
 
 # Heading 1

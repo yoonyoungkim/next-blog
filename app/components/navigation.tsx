@@ -46,7 +46,7 @@ const Navigation = ({ segment }: { segment: string }) => {
           {
             filteredPosts.map((post, index) => (
               <Link key={index} href={`/${segment}/${post.slug}`}>
-                <li style={{ color: '#ffffff' }}>{post.title} - {post.date}</li>
+                <li style={{ color: '#ffffff' }}>{post.title}</li>
               </Link>
             ))
           }

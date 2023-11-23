@@ -1,6 +1,5 @@
 export const PAGE_DATA_LIST: string[] = [
   'title',
-  'author',
   'content',
 ];
 
