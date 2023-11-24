@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@stitches/react": "^1.2.8",
     "gray-matter": "^4.0.3",
     "next": "14.0.2",
     "react": "^18",
