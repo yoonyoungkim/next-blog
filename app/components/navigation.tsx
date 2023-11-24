@@ -2,52 +2,24 @@
 
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { PostType } from '@/app/interfaces/post';
 import MenuClose from '@/app/public/icon__menu-close-white.svg';
 import MenuOpen from '@/app/public/icon__menu-open-white.svg';
 import Image from 'next/image';
-import { TreePostType } from '@/app/interfaces/treePost';
 import Tree from '@/app/components/tree';
-
-const arrayToTree: any = (arr: TreePostType[], parentId = '') =>
-  arr.filter(item => item.parentId === parentId)
-    .map(child => ({ ...child, children: arrayToTree(arr, child.id) }));
-
-interface PostTypeWithIsOpen extends PostType {
-  isOpen: boolean;
-}
-
+import { MenuType } from '@/app/interfaces/menu';
+import { menusToTree } from '@/app/components/nativationUtil';
 
 const Navigation = ({ segment }: { segment: string }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(true);
-  const [posts, setPosts] = useState<PostTypeWithIsOpen[]>([]);
+  const [menus, setMenus] = useState<MenuType[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const hasSearchKeyword = useMemo(() => searchKeyword?.length > 0, [searchKeyword?.length]);
-  const filteredPosts = useMemo(() => posts
-    .filter(({ title }) => !title ? true : title.includes(searchKeyword)), [posts, searchKeyword]);
-  const treePosts = useMemo(() => {
-    const postsWithId = posts.map(post => {
-      const slugArray = post.slug.split('/').filter(slug => slug !== 'index');
-      return {
-        id: slugArray.join('_'),
-        parentId: slugArray.slice(0, slugArray.length - 1).join('_'),
-        slug: `${segment}/${post.slug}`,
-        title: post.title,
-        isOpen: post.isOpen,
-      };
-    });
-    return arrayToTree(postsWithId);
-  }, [posts]);
 
-  useEffect(() => {
-    (async () => {
-      const response = await fetch(`/api/${segment}/posts`);
-      const posts = (await response.json())
-        .map((post: PostTypeWithIsOpen) => ({ ...post, isOpen: true }));
-      setPosts(posts);
-    })();
-  }, [segment]);
+  const searchedMenus = useMemo(() => menus
+    .filter(({ title }) => title?.includes(searchKeyword)), [menus, searchKeyword]);
+
+  const treePosts = useMemo(() => menusToTree(menus), [menus]);
 
   const handleChange = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(event.target.value);
@@ -58,16 +30,26 @@ const Navigation = ({ segment }: { segment: string }) => {
   }, [isOpenMenu]);
 
   const handleClickTreeItem = useCallback((slug: string) => {
-    setPosts(posts.map((post: PostTypeWithIsOpen) => {
-      if (slug === `${segment}/${post.slug}`) {
+    const updateMenu = menus.map((menu: MenuType) => {
+      if (slug === menu.slug) {
         return {
-          ...post,
-          isOpen: !post.isOpen,
+          ...menu,
+          isOpen: !menu.isOpen,
         };
       }
-      return post;
-    }));
-  }, [posts]);
+      return menu;
+    });
+    setMenus(updateMenu);
+  }, [menus]);
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(`/api/${segment}/posts`);
+      const menus = (await response.json())
+        .map((menu: MenuType) => ({ ...menu, isOpen: true }));
+      setMenus(menus);
+    })();
+  }, [segment]);
 
   return (
     <div
@@ -81,11 +63,11 @@ const Navigation = ({ segment }: { segment: string }) => {
         </div>
         <ul>
           {
-            hasSearchKeyword ? (filteredPosts.map((post, index) => (
+            hasSearchKeyword ? (searchedMenus.map((post, index) => (
               <Link key={index} href={`/${segment}/${post.slug}`}>
                 <li style={{ color: '#ffffff' }}>{post.title}</li>
               </Link>
-            ))) : <Tree tree={treePosts} handleClickTreeItem={handleClickTreeItem} />
+            ))) : <Tree tree={treePosts} segment={segment} handleClickTreeItem={handleClickTreeItem} />
           }
         </ul>
       </div>) : (<div style={{ padding: '20px 10px' }}>

@@ -1,9 +1,14 @@
-import { TreePostType } from '@/app/interfaces/treePost';
+import { TreeItemType } from '@/app/interfaces/treeItem';
 import TreeItem from '@/app/components/treeItem';
 
-const Tree = ({ tree, handleClickTreeItem }: { tree: TreePostType[], handleClickTreeItem: (slug: string) => void }) => {
+const Tree = ({ tree, segment, handleClickTreeItem }: {
+  tree: TreeItemType[],
+  segment: string,
+  handleClickTreeItem: (slug: string) => void
+}) => {
   return (<>
-    {tree?.map((post) => (<TreeItem key={post.id} tree={post} handleClickTreeItem={handleClickTreeItem} />))}
+    {tree?.map((post) => (
+      <TreeItem key={post.id} segment={segment} tree={post} handleClickTreeItem={handleClickTreeItem} />))}
   </>);
 };
 
